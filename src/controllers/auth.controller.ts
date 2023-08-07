@@ -1,7 +1,6 @@
 import { Request, Response } from "express"
 import { LoginUserInput } from "../schema/auth.schema"
 import { findUserByEmail } from "../service/user.service"
-import omit from "../utils/omit"
 import { signJwt } from "../utils/auth.utils"
 
 export async function loginUserHandler(
@@ -16,15 +15,14 @@ export async function loginUserHandler(
       return res.status(501).json({ message: "Invalid Creadentials!" })
     }
 
-    const paylaod = omit(user.toJSON(), ["password"])
+    const paylaod = user.toJSON()
     const jwt = await signJwt(paylaod)
 
     res.cookie("accessToken", jwt, {
       maxAge: 3.154e10, // 1 year,
       httpOnly: true,
-      domain: "localhost",
       sameSite: "strict",
-      secure: false,
+      secure: true,
       path: "/",
     })
 
